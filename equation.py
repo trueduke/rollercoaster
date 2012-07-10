@@ -1,36 +1,24 @@
-import os, sys; sys.path.insert(0, "..")
 from nodebox.graphics import *
-
 from math import *
-
 import Box2D as physics
+
+DEBUG = False
 
 
 class Equation(object):
     def __init__(self, world):
+        # the equation is an expression given by the player
         eq_s = "x*x/40.0 if x >0 else -x"
+        # we compile it to call it quickly from the calc function
         self.eq = compile(eq_s, '<string>', 'eval')
 
-
-        self.verts = [(x, self.calc(x)) for x in range(-100, 100, 1)]
-        # new_ones = [(vert[0]-0.1, vert[1]-0.1) for vert in reversed(self.verts)]
-        # self.verts += new_ones
-
-        # bd = physics.b2BodyDef()
-        # bd.position = (0.0, 0.0)
-        # self.body = world.CreateBody(bd)
         
-        # edgeDef = physics.b2EdgeChainDef()
-        # edgeDef.setVertices_tuple(self.verts)
-        # edgeDef.isALoop = False
-        # edgeDef.density = 0
-        # self.shape = self.body.CreateShape(edgeDef)
+        # now we have to build it in the world
 
-        # self.body.SetMassFromShapes()
+        # first, calculate the points/vertices
+        self.verts = [(x, self.calc(x)) for x in range(-500, 500, 1)]
 
-        # self.shape.friction = 0
-        # self.shape.restitution = 1.0
-
+        # for each triplet of vertices, we create a body linking them
         for i, vert in enumerate(self.verts):
             if i==0 or i==len(self.verts)-1:
                 continue
@@ -44,13 +32,13 @@ class Equation(object):
             edgeDef.setVertices(v)
             shape = body.CreateShape(edgeDef)
 
+            # for a fixed body, mass has to be zero
             body.mass = 0
 
     def update(self):
         pass
 
     def calc(self, x):
-        # ret = x*x/40.0 if x >0 else -x
         ret = eval(self.eq)
         ret = min(100, ret)
         return float(ret)
@@ -69,16 +57,18 @@ class Equation(object):
             prev_y = y
 
         fill (0)
-        # for x, y in self.verts:
-        #     ellipse(system.get_screen_x(x), system.get_screen_y(y), 10, 10)
 
-        # for i, vert in enumerate(self.verts):
-        #     if i==0 or i==len(self.verts)-1:
-        #         continue
+        if DEBUG:
+            for x, y in self.verts:
+                ellipse(system.get_screen_x(x), system.get_screen_y(y), 10, 10)
 
-        #     x0, y0 = (self.verts[i-1][0], self.verts[i-1][1])
-        #     x1, y1 = (vert[0], vert[1])
-        #     x2, y2 = (self.verts[i+1][0], self.verts[i+1][1])
-        #     line(system.get_screen_x(x0),system.get_screen_y(y0), system.get_screen_x(x1), system.get_screen_y(y1))
-        #     line(system.get_screen_x(x1),system.get_screen_y(y1), system.get_screen_x(x2), system.get_screen_y(y2))
+            # for i, vert in enumerate(self.verts):
+            #     if i==0 or i==len(self.verts)-1:
+            #         continue
+
+            #     x0, y0 = (self.verts[i-1][0], self.verts[i-1][1])
+            #     x1, y1 = (vert[0], vert[1])
+            #     x2, y2 = (self.verts[i+1][0], self.verts[i+1][1])
+            #     line(system.get_screen_x(x0),system.get_screen_y(y0), system.get_screen_x(x1), system.get_screen_y(y1))
+            #     line(system.get_screen_x(x1),system.get_screen_y(y1), system.get_screen_x(x2), system.get_screen_y(y2))
 
