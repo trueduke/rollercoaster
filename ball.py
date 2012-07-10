@@ -30,8 +30,8 @@ class Ball(object):
         self.body.SetMassFromShapes()
 
         # fixtures
-        self.shape.friction = 0.5
-        self.shape.restitution = 0.7
+        self.shape.friction = 1.0
+        self.shape.restitution = 0.1
 
         # initial angular velocity
         self.body.angularVelocity = -30.0

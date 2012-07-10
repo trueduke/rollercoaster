@@ -3,6 +3,7 @@ from ball import Ball
 from system import System
 from equation import Equation
 import Box2D as physics
+from nodebox.gui import *
 
 # define a world
 worldAABB=physics.b2AABB()
@@ -11,11 +12,12 @@ worldAABB.lowerBound = (-1000, -1000)
 worldAABB.upperBound = ( 1000,  1000)
 
 # setup gravity
-gravity = physics.b2Vec2(0, -50)
+gravity = physics.b2Vec2(0, 0)
 # let body sleep
 doSleep = True
 
-# initialize world
+# initialize our world
+# global world
 world = physics.b2World(worldAABB, gravity, doSleep)
 
 # Prepare for simulation. Typically we use a time step of 1/60 of a
@@ -41,12 +43,66 @@ def show_coord_in_system(system):
 
 # nodebox slider plugged to the system scale
 def create_scale_slider():
-    from nodebox.gui import Slider
     slider = Slider(default=5.0, min=1.0, max=30.0, steps=100)
     slider.x = 10
     slider.y = 10
-    canvas.append(slider)
+    # canvas.append(slider)
     return slider
+
+# button for gravity
+def create_start_button():
+    button = Button("Go!", action=change_mode, x=10, y=30, width=125)
+    # canvas.append(button)
+    return button
+
+# start gravity
+def start_gravity(button):
+    gravity = physics.b2Vec2(0, -100)
+    world.gravity = gravity
+
+# reset level
+def reset_level(button):
+    # here, put each ball in a mode where they go back to their initial position
+    # for the moment, destroy the balls and recreate them at their init position
+    destroy_balls()
+    init_balls()
+    gravity = physics.b2Vec2(0, 0)
+    world.gravity = gravity
+
+def change_mode(button):
+    if button.caption == "Go!":
+        start_gravity(button)
+        button.caption = "Reset"
+    elif button.caption == "Reset":
+        reset_level(button)
+        button.caption = "Go!"
+
+def create_equation_field(equation):
+    field = Field(value=equation.expression_string, height=70, wrap=True, hint="expression", id="field_text")
+    return field
+
+def create_equation_update_button(equation, equation_field):
+    button = Button("Update", action=update_equation, x=10, y=30, width=125)
+    button.associated_field = equation_field
+    button.associated_equation = equation
+    return button
+
+def update_equation(button):
+    button.associated_equation.expression_string = button.associated_field.value
+    button.associated_equation.reset()
+
+def create_panel(equation_field, equation_button, scale_slider, start_button):
+    panel = Panel("Control Panel", width=400, height=200, fixed=False, modal=True, x=10, y=50)
+    panel.append(Rows(
+    [("Your\n\nequation", equation_field),
+     ("Update eq", equation_button),
+     ("scale", scale_slider),
+     ("show grid?", Flag(default=True, id="show")),
+     ("ready?", start_button),
+    ], width=200))
+    panel.pack()
+    canvas.append(panel)
+    return panel
 
 ####
 
@@ -56,15 +112,35 @@ canvas.size = 800, 800
 # our ortho system, width and height in pixels
 s = System(800, 800)
 
+e = Equation(world)
+
 # our slider
 slider = create_scale_slider()
+# start button
+button = create_start_button()
+# equation field
+field = create_equation_field(e)
+# equation button
+equation_button = create_equation_update_button(e, field)
+# panel
+panel = create_panel(field, equation_button, slider, button)
 
 balls = []
 
-for i in range(10):
-    balls.append(Ball(world, -50, 70 + i*20, 0))
+def init_balls():
+    for i in range(1):
+        balls.append(Ball(world, -50, 80 + i*20, 0))
 
-e = Equation(world)
+def destroy_balls():
+    balls_to_remove = []
+    for ball in balls:
+        world.DestroyBody(ball.body)
+        balls_to_remove.append(ball)
+
+    for ball in balls_to_remove:
+        balls.remove(ball)
+
+init_balls()
 
 def update():
     world.Step(timeStep, vel_iters, pos_iters)
@@ -94,7 +170,7 @@ def draw(canvas):
 
     # drag view
     m = canvas.mouse
-    if m.dragged:
+    if m.dragged and not panel.dragged:
         s.x += m.dx
         s.y += m.dy
 
