@@ -20,7 +20,7 @@ class Equation(object):
 
     def initialize_bodies(self):
         # first, calculate the points/vertices
-        self.verts = [(x, self.calc(x)) for x in range(-200, 200, 1)]
+        self.verts = [(x*0.5, self.calc(x*0.5)) for x in range(-200, 200, 1)]
 
         # for each triplet of vertices, we create a body linking them
         self.bodies = []

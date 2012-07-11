@@ -43,7 +43,7 @@ def show_coord_in_system(system):
 
 # nodebox slider plugged to the system scale
 def create_scale_slider():
-    slider = Slider(default=5.0, min=1.0, max=30.0, steps=100)
+    slider = Slider(default=30.0, min=3.0, max=50.0, steps=100)
     slider.x = 10
     slider.y = 10
     # canvas.append(slider)
@@ -57,7 +57,7 @@ def create_start_button():
 
 # start gravity
 def start_gravity(button):
-    gravity = physics.b2Vec2(0, -100)
+    gravity = physics.b2Vec2(0, -10)
     world.gravity = gravity
 
 # reset level
@@ -129,7 +129,7 @@ balls = []
 
 def init_balls():
     for i in range(1):
-        balls.append(Ball(world, -50, 80 + i*20, 0))
+        balls.append(Ball(world, -5, 8 + i*2, 0))
 
 def destroy_balls():
     balls_to_remove = []

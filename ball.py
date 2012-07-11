@@ -6,7 +6,7 @@ import Box2D as physics
 class Ball(object):
     def __init__(self, world, x0, y0, theta0):
         # constants
-        self.radius = 4
+        self.radius = 0.5
 
         # coordinates for drawing
         self.theta = theta0
