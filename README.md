@@ -1,11 +1,11 @@
 rollercoaster
 ==============
 
-A little game project using NodeBox and Box2D
+A little game project to teach about curve sketching.
 
-Requirements : 
-- NodeBox for OpenGL 1.7 (http://www.cityinabottle.org/nodebox/)
-- PyBox2D (http://code.google.com/p/pybox2d/) & SWIG
+Dependencies : 
+- NodeBox for OpenGL 1.7 (http://www.cityinabottle.org/nodebox/) - requires PyGLet
+- PyBox2D (http://code.google.com/p/pybox2d/) - requires SWIG
 - Python 2.7
 
-Just run game.py...
+Just run "python game.py"
